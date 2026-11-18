@@ -39,5 +39,11 @@ CREATE TABLE IF NOT EXISTS notifications(
 CREATE INDEX IF NOT EXISTS idx_notifications_user
 ON notifications(user_id, is_read, id);
 `);
+
+const userColumns = db.prepare('PRAGMA table_info(users)').all().map(c => c.name);
+if (!userColumns.includes('is_test')) {
+  db.exec('ALTER TABLE users ADD COLUMN is_test INTEGER NOT NULL DEFAULT 0');
+}
 module.exports=db;
+
 
