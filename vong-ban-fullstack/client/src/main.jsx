@@ -2,7 +2,7 @@ import React,{useEffect,useState}from'react';import{createRoot}from'react-dom/cl
 const api='/api',tok=()=>localStorage.getItem('vbtoken'),H=()=>({Authorization:'Bearer '+tok()});
 async function req(url,opt={}){let r=await fetch(api+url,{...opt,headers:{...H(),...(opt.body instanceof FormData?{}:{'Content-Type':'application/json'}),...opt.headers}}),d=await r.json();if(!r.ok)throw Error(d.error||'Có lỗi');return d}
 function App(){let[t,S]=useState(tok()),[me,M]=useState(null),[page,P]=useState(()=>location.pathname.match(/^\/profile\/(\d+)\/?$/)?'profile':(sessionStorage.getItem('vbpage')||'feed')),[ready,Ready]=useState(!tok()),[profile,PR]=useState(null),[posts,PS]=useState([]),[people,PE]=useState([]),[chat,CH]=useState(null),[msgs,MS]=useState([]),[err,ER]=useState(''),[searchId,SI]=useState(''),[notifications,setNotifications]=useState([]),[showNotifications,setShowNotifications]=useState(false);
-useEffect(()=>{if(!t){Ready(true);return}Ready(false);req('/me').then(x=>M(x.user)).catch(()=>out()).finally(()=>Ready(true))},[t]);useEffect(()=>{if(!t)return;let s=io('/',{auth:{token:t}});s.on('message',m=>{if(chat&&(m.sender_id===chat.id||m.receiver_id===chat.id))MS(v=>v.some(x=>x.id===m.id)?v:[...v,m])});s.on('notification',n=>setNotifications(v=>[n,...v]));return()=>s.disconnect()},[t,chat]);
+useEffect(()=>{if(!t){Ready(true);return}Ready(false);req('/me').then(x=>M(x.user)).catch(()=>out()).finally(()=>Ready(true))},[t]);useEffect(()=>{if(!t)return;let s=io('/',{auth:{token:t}});s.on('message',m=>{if(chat&&(m.sender_id===chat.id||m.receiver_id===chat.id))MS(v=>v.some(x=>x.id===m.id)?v:[...v,m])});s.on('notification',n=>setNotifications(v=>v.some(x=>x.id===n.id)?v:[n,...v]));return()=>s.disconnect()},[t,chat]);
 useEffect(()=>{if(t)req('/notifications').then(setNotifications).catch(console.error)},[t]);
 useEffect(()=>{if(t&&page==='feed')load();if(t&&(page==='people'||page==='messages'))req('/people').then(PE).catch(e=>ER(e.message))},[t,page]);useEffect(()=>{sessionStorage.setItem('vbpage',page)},[page]);
 useEffect(()=>{
@@ -322,7 +322,7 @@ async function send(){
 if(!active||!t.trim())return;
 try{
 let m=await req('/messages/'+active.id,{method:'POST',body:JSON.stringify({body:t})});
-setMsgs(v=>[...v,m]);T('');
+setMsgs(v=>v.some(x=>x.id===m.id)?v:[...v,m]);T('');
 }catch(e){alert(e.message)}
 }
 return <section className="chat">
