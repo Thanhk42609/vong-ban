@@ -1,5 +1,5 @@
 const fs=require('fs'),path=require('path'),DB=require('better-sqlite3');
-fs.mkdirSync(path.join(__dirname,'../data'),{recursive:true});const db=new DB(path.join(__dirname,'../data/vongban.sqlite'));db.pragma('journal_mode=WAL');
+const dataDir=process.env.DATA_DIR||path.join(__dirname,'../data');fs.mkdirSync(dataDir,{recursive:true});const db=new DB(path.join(dataDir,'vongban.sqlite'));db.pragma('journal_mode=WAL');
 db.exec(`
 CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY,name TEXT NOT NULL,email TEXT UNIQUE NOT NULL,password TEXT NOT NULL,bio TEXT DEFAULT '',city TEXT DEFAULT '',hometown TEXT DEFAULT '',job TEXT DEFAULT '',education TEXT DEFAULT '',birthday TEXT DEFAULT '',avatar TEXT DEFAULT '',cover TEXT DEFAULT '',created_at TEXT DEFAULT CURRENT_TIMESTAMP);
 CREATE TABLE IF NOT EXISTS posts(id INTEGER PRIMARY KEY,user_id INTEGER,content TEXT DEFAULT '',media TEXT DEFAULT '',media_type TEXT DEFAULT '',privacy TEXT DEFAULT 'public',created_at TEXT DEFAULT CURRENT_TIMESTAMP);

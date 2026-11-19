@@ -174,6 +174,9 @@ function Profile({data,me,posts,refresh,open}){
    {data.isMe
      ? <button onClick={()=>E(!edit)}>✎ Chỉnh sửa trang cá nhân</button>
      : <div className="friend-actions">
+         <button disabled={busy} onClick={()=>action('/users/'+u.id+'/follow')}>
+           {data.following?'✓ Đang theo dõi':'＋ Theo dõi'}
+         </button>
        {isFriend
          ? <button disabled={busy} onClick={()=>{
              if(confirm('Bạn có chắc muốn hủy kết bạn?'))
