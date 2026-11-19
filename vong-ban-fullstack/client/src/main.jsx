@@ -29,7 +29,13 @@ useEffect(()=>{
   return ()=>removeEventListener('popstate',back);
 },[]);
 useEffect(()=>{if(t&&me&&page==='profile'&&!profile){let match=location.pathname.match(/^\/profile\/(\d+)\/?$/);let id=match?match[1]:(sessionStorage.getItem('vbprofile')||me.id);req('/users/'+id).then(d=>{PR(d);return req('/users/'+id+'/posts')}).then(PS).catch(()=>P('feed'))}},[t,me,page,profile]);
-function out(){localStorage.removeItem('vbtoken');S(null);M(null)}async function load(){try{PS(await req('/posts'))}catch(e){ER(e.message)}}
+function out(){
+  localStorage.removeItem('vbtoken');
+  sessionStorage.removeItem('vbprofile');
+  sessionStorage.setItem('vbpage','feed');
+  history.replaceState({},'','/');
+  PR(null); CH(null); MS([]); P('feed'); M(null); S(null);
+}async function load(){try{PS(await req('/posts'))}catch(e){ER(e.message)}}
 async function searchById(){
   const id=Number(searchId.trim());
   if(!Number.isSafeInteger(id)||id<1){
